@@ -1,0 +1,28 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Virtual environment ---
+venv/
+.env/
+
+# --- Logs & temp files ---
+*.log
+*.tmp
+
+# --- macOS system files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- IDE / editor cache ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Project specific ---
+logs/
+tests/__pycache__/
