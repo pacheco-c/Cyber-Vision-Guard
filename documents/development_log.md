@@ -1,0 +1,15 @@
+10 Novembre 2025
+- Creata struttura cartelle del progetto
+- Scritto documento di idea iniziale
+- Creato ambiente virtuale Python
+- Installate librerie base
+- Testata webcam integrata con OpenCV (OK)
+- Implementata lettura di frame consecutivi (frame_precedente e frame_corrente)
+- Aggiunta elaborazione delle differenze tra i frame con OpenCV
+- Ora il sistema mostra la "mappa di differenza" (aree bianche dove c'è movimento)
+- Implementata rilevazione contorni con cv2.findContours
+- Disegnati rettangoli verdi sulle aree di movimento
+- Sistema genera alert testuale in console quando viene rilevato movimento reale
+- Implementata gestione intelligente degli alert
+- Aggiunto controllo temporale (SOGLIA_TEMPO e COOLDOWN) per evitare falsi positivi e messaggi ripetuti
+- Ora il sistema invia un alert solo se il movimento è continuo per almeno 0.5s e non vengono generati nuovi alert entro 4s
