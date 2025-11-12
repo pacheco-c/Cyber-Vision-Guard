@@ -35,6 +35,7 @@
 - Test preliminare completato con webcam in tempo reale
 
 12 Novembre 2025
+
 - Creato modulo `event_manager.py` per la gestione intelligente degli eventi.
 - Implementata logica di inizio/fine evento con timestamp e durata.
 - Integrato Event Manager nel loop principale di `cyber_vision_guard.py`.
@@ -43,3 +44,17 @@
 - Implementata generazione automatica della chiave segreta (`secret.key`).
 - Integrato nel loop principale: ogni evento viene ora cifrato e firmato.
 - Test eseguito: generazione file `.enc` in /logs con hash verificabile.
+- Creato modulo `server/app.py` per la gestione del server Flask locale.  
+- Implementato endpoint `/api/alert` per ricevere file cifrati via HTTP POST.  
+- Configurata cartella `server/received_logs/` per il salvataggio automatico dei file ricevuti.  
+- Testato correttamente l’invio di file `.enc` dal client tramite comando `curl`.  
+- Verificato funzionamento completo della comunicazione:  
+  il server riceve, salva e risponde con `status: ok`.
+- Creato modulo src/server_client.py per la trasmissione automatica dei file cifrati al server Flask.
+- Integrato invio diretto dei log nel ciclo principale di Cyber-Vision Guard.
+- Testato con server locale: ricezione confermata senza uso di curl.
+- Modulo src/server_client.py creato per la trasmissione automatica dei file cifrati al server.
+- integrato l'invio diretto dei log nel ciclo principale del sistema Cyber-Vision Guard.
+- Implementato controllo di integrità hash-chain.
+- Aggiunto controllo durata minima evento in event_manager.py.
+- Migliorata gestione dello stato degli eventi.

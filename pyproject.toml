@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cyber-vision-guard"
+version = "0.0.1"
+description = "Cyber-Vision Guard: AI + Cybersecurity Surveillance System"
+authors = [{ name = "Kevin Pacheco" }]
+readme = "README.md"
+requires-python = ">=3.8"

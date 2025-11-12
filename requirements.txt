@@ -1,0 +1,5 @@
+opencv-python
+cryptography
+flask
+requests
+ultralytics

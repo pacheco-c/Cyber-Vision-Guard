@@ -1,7 +1,9 @@
+import os
 import cv2
 from ultralytics import YOLO
 from event_manager import gestisci_evento
 from security.encryptor import cifra_evento
+from server_client import invia_file_al_server
 
 # --- Inizializzazione del sistema ---
 print("Avvio Cyber-Vision Guard...")
@@ -68,6 +70,8 @@ while True:
     if evento:
         print(f"🧾 Nuovo evento registrato: {evento}")
         firma = cifra_evento(evento)
+        ultimo_file = sorted(os.listdir("logs"))[-1]  # prende l'ultimo log creato
+        invia_file_al_server(os.path.join("logs", ultimo_file))
 
     # --- 3️⃣ Mostra stato sullo schermo ---
     if persona_rilevata:
