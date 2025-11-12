@@ -4,17 +4,12 @@ __pycache__/
 *.pyo
 *.pyd
 *.log
-.DS_Store
-.idea/
+*.tmp
+
 # --- Virtual environment ---
 venv/
 .env/
 .venv/
-
-
-# --- Logs & temp files ---
-*.log
-*.tmp
 
 # --- macOS system files ---
 .DS_Store
@@ -28,6 +23,11 @@ venv/
 *.swo
 
 # --- Project specific ---
+# Log e dati temporanei
 logs/
-tests/__pycache__/
 logs/*.enc
+server/received_logs/
+tests/__pycache__/
+
+# Chiavi di sicurezza
+src/security/secret.key
