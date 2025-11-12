@@ -1,5 +1,7 @@
 import cv2
 from ultralytics import YOLO
+from event_manager import gestisci_evento
+from security.encryptor import cifra_evento
 
 # --- Inizializzazione del sistema ---
 print("Avvio Cyber-Vision Guard...")
@@ -60,6 +62,12 @@ while True:
                 cv2.rectangle(frame_corrente, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
                 cv2.putText(frame_corrente, f"Persona {conf:.2f}", (int(x1), int(y1) - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+    
+    # --- Gestione eventi intelligenti ---
+    evento = gestisci_evento(persona_rilevata)
+    if evento:
+        print(f"🧾 Nuovo evento registrato: {evento}")
+        firma = cifra_evento(evento)
 
     # --- 3️⃣ Mostra stato sullo schermo ---
     if persona_rilevata:

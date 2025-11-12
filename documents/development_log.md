@@ -33,3 +33,13 @@
 - Sistema ora rileva movimento e verifica se è causato da una persona
 - Aggiunto alert visivo rosso "Persona in movimento rilevata"
 - Test preliminare completato con webcam in tempo reale
+
+12 Novembre 2025
+- Creato modulo `event_manager.py` per la gestione intelligente degli eventi.
+- Implementata logica di inizio/fine evento con timestamp e durata.
+- Integrato Event Manager nel loop principale di `cyber_vision_guard.py`.
+- Ora il sistema genera un solo log per ogni persona rilevata, evitando spam e rallentamenti.
+- Creato modulo `security/encryptor.py` per cifratura e firma digitale.
+- Implementata generazione automatica della chiave segreta (`secret.key`).
+- Integrato nel loop principale: ogni evento viene ora cifrato e firmato.
+- Test eseguito: generazione file `.enc` in /logs con hash verificabile.
