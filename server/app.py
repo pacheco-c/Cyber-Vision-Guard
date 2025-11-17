@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 from security.decryptor import decifra_evento
 from security.hash_chain import aggiorna_catena
 from security.hash_chain import verifica_catena
+from database_manager import salva_evento
 import time
 
 
@@ -31,11 +32,31 @@ def ricevi_alert():
         print(f"Ricevuto file cifrato: {filename}")
         try:
             evento = decifra_evento(filename)
+            print(f"🧾 Evento decifrato: {evento}")
+
+            # 1️⃣ Verifica la catena prima di aggiornare
             try:
                 verifica_catena()
             except Exception as e:
-                print(f"⚠️  Errore nella verifica della catena: {e}")
-            aggiorna_catena(evento)
+                print(f"⚠️ Errore nella verifica catena: {e}")
+
+            # 2️⃣ Aggiorna catena e ottiene hash correnti
+            result = aggiorna_catena(evento)
+
+            # Compatibilità: se la funzione restituisce solo un valore
+            if isinstance(result, tuple):
+                nuovo_hash, hash_precedente = result
+            else:
+                nuovo_hash = result
+                hash_precedente = "0" * 64  # fallback di sicurezza
+
+            print(f"🔗 Hash chain aggiornata. Nuovo blocco: {nuovo_hash[:8]}...")
+
+            # 3️⃣ Salva l’evento nel database
+            salva_evento(evento, nuovo_hash, hash_precedente)
+            print("💾 Evento salvato nel database con successo.")
+          
+
         except Exception as e:
             print(f"⚠️ Errore durante la decifratura: {e}")
         return jsonify({"status": "ok", "message": "File ricevuto con successo"}), 200

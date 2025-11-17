@@ -58,3 +58,8 @@
 - Implementato controllo di integrità hash-chain.
 - Aggiunto controllo durata minima evento in event_manager.py.
 - Migliorata gestione dello stato degli eventi.
+
+17 Novembre 2025
+-Implementato database MySql locale per la registrazione degli eventi, creazione tabella.
+-Aggiunto modulo server/database_manager.py per la gestione delle connessioni e salvataggio dei log.
+-Eseguiti test verifica.

@@ -45,3 +45,4 @@ def gestisci_evento(persona_rilevata):
 
     # 🔁 Se non cambia nulla, non ritorna niente
     return None
+
