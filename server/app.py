@@ -4,8 +4,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from flask import Flask, request, jsonify, render_template
 from security.decryptor import decifra_evento
+from flask import send_from_directory
 from security.hash_chain import aggiorna_catena, verifica_catena
 from database_manager import salva_evento, leggi_eventi
+from flask import send_file
+from io import BytesIO
+from security.decryptor import decifra_file_bytes
 from datetime import datetime
 
 
@@ -15,7 +19,34 @@ verifica_catena()
 # Crea la cartella dove salvare i file ricevuti
 os.makedirs("server/received_logs", exist_ok=True)
 
-@app.route("/api/alert", methods=["POST"])
+
+
+
+
+@app.route("/image/<path:filename>")
+def mostra_immagine(filename):
+    """
+    Decifra temporaneamente l'immagine cifrata (.enc) e la invia al browser.
+    L'immagine non viene mai salvata in chiaro su disco.
+    """
+    from flask import send_file
+    from io import BytesIO
+    from security.decryptor import decifra_file_bytes
+
+    full_path = os.path.join("server/received_images", filename)
+    if not os.path.exists(full_path):
+        return "File non trovato", 404
+
+    try:
+        # Decifra il contenuto in RAM
+        decrypted_bytes = decifra_file_bytes(full_path)
+
+        # Ritorna al browser come immagine JPEG temporanea
+        return send_file(BytesIO(decrypted_bytes), mimetype="image/jpeg")
+
+    except Exception as e:
+        print(f"❌ Errore decifratura immagine: {e}")
+        return "Errore nella decifratura", 500
 
 @app.route("/api/alert", methods=["POST"])
 def ricevi_alert():

@@ -32,3 +32,22 @@ def decifra_evento(percorso_file_enc, key_path=None):
     print(f" Firma SHA256: {firma_calcolata[:16]}...")
     print(f" Evento: {evento}")
     return evento
+
+def decifra_file_bytes(percorso_file):
+    """
+    Decifra un file cifrato (.enc) e restituisce i bytes del contenuto.
+    Utile per inviare immagini al browser senza scrivere su disco.
+    """
+    
+
+    key_path = os.path.join(os.path.dirname(__file__), "secret.key")
+    # Carica la chiave
+    with open(key_path, "rb") as f:
+        key = f.read()
+    fernet = Fernet(key)
+
+    with open(percorso_file, "rb") as f:
+        dati_cifrati = f.read()
+
+    dati_decifrati = fernet.decrypt(dati_cifrati)
+    return dati_decifrati
