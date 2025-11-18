@@ -1,12 +1,12 @@
 # --- server/app.py ---
-import sys, os
+import sys, os, time
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-from flask import Flask, request, jsonify
+
+from flask import Flask, request, jsonify, render_template
 from security.decryptor import decifra_evento
-from security.hash_chain import aggiorna_catena
-from security.hash_chain import verifica_catena
-from database_manager import salva_evento
-import time
+from security.hash_chain import aggiorna_catena, verifica_catena
+from database_manager import salva_evento, leggi_eventi
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -16,55 +16,98 @@ verifica_catena()
 os.makedirs("server/received_logs", exist_ok=True)
 
 @app.route("/api/alert", methods=["POST"])
+
+@app.route("/api/alert", methods=["POST"])
 def ricevi_alert():
     """
-    Riceve un file cifrato da Cyber-Vision Guard e lo salva localmente.
+    Riceve un file cifrato e un'immagine cifrata dal client,
+    li salva localmente e aggiorna il database + hash chain.
     """
     try:
-        file = request.files.get("file")
-        if not file:
-            return jsonify({"status": "error", "message": "Nessun file ricevuto"}), 400
+        # === 1️⃣ File log cifrato ===
+        file_log = request.files.get("file")
+        if not file_log:
+            return jsonify({"status": "error", "message": "Nessun file di log ricevuto"}), 400
 
-        # Salva il file con timestamp
-        filename = f"server/received_logs/{int(time.time())}_{file.filename}"
-        file.save(filename)
+        os.makedirs("server/received_logs", exist_ok=True)
+        log_path = f"server/received_logs/{int(time.time())}_{file_log.filename}"
+        file_log.save(log_path)
+        print(f"🧾 Log cifrato ricevuto: {log_path}")
 
-        print(f"Ricevuto file cifrato: {filename}")
+        # === 2️⃣ File immagine cifrata (opzionale) ===
+        file_img = request.files.get("image")
+        img_path = None
+        if file_img:
+            os.makedirs("server/received_images", exist_ok=True)
+            img_path = f"server/received_images/{int(time.time())}_{file_img.filename}"
+            file_img.save(img_path)
+            print(f"🖼️ Immagine cifrata ricevuta: {img_path}")
+        else:
+            print("⚠️ Nessuna immagine cifrata ricevuta (campo 'image' mancante).")
+
+        # === 3️⃣ Decifra e processa il log ===
         try:
-            evento = decifra_evento(filename)
-            print(f"🧾 Evento decifrato: {evento}")
+            evento = decifra_evento(log_path)
+            print(f"📄 Evento decifrato: {evento}")
 
-            # 1️⃣ Verifica la catena prima di aggiornare
+            # Verifica catena di integrità
             try:
                 verifica_catena()
             except Exception as e:
                 print(f"⚠️ Errore nella verifica catena: {e}")
 
-            # 2️⃣ Aggiorna catena e ottiene hash correnti
-            result = aggiorna_catena(evento)
+            # Aggiorna catena hash
+            nuovo_hash, hash_precedente = aggiorna_catena(evento)
+            print(f"🔗 Hash chain aggiornata → {nuovo_hash[:10]}...")
 
-            # Compatibilità: se la funzione restituisce solo un valore
-            if isinstance(result, tuple):
-                nuovo_hash, hash_precedente = result
-            else:
-                nuovo_hash = result
-                hash_precedente = "0" * 64  # fallback di sicurezza
-
-            print(f"🔗 Hash chain aggiornata. Nuovo blocco: {nuovo_hash[:8]}...")
-
-            # 3️⃣ Salva l’evento nel database
+            # Salva nel database (aggiungendo eventuale riferimento all’immagine)
+            evento["screenshot_path"] = img_path  # aggiunge il campo immagine
             salva_evento(evento, nuovo_hash, hash_precedente)
-            print("💾 Evento salvato nel database con successo.")
-          
+
+            print("💾 Evento e immagine salvati correttamente nel database.")
 
         except Exception as e:
-            print(f"⚠️ Errore durante la decifratura: {e}")
-        return jsonify({"status": "ok", "message": "File ricevuto con successo"}), 200
+            print(f"❌ Errore durante la decifratura o salvataggio: {e}")
+
+        return jsonify({"status": "ok", "message": "File ricevuti e registrati"}), 200
 
     except Exception as e:
-        print("Errore ricezione:", e)
+        print(f"🚨 Errore ricezione: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/dashboard")
+def dashboard():
+    eventi = leggi_eventi()
+    stato_catena = verifica_catena()
+
+    # 🔄 Conversione timestamp UNIX → data leggibile
+    for ev in eventi:
+        if ev.get("timestamp_inizio"):
+            ev["timestamp_inizio_fmt"] = datetime.fromtimestamp(ev["timestamp_inizio"]).strftime("%d/%m/%Y %H:%M:%S")
+        else:
+            ev["timestamp_inizio_fmt"] = None
+        if ev.get("timestamp_fine"):
+            ev["timestamp_fine_fmt"] = datetime.fromtimestamp(ev["timestamp_fine"]).strftime("%d/%m/%Y %H:%M:%S")
+        else:
+            ev["timestamp_fine_fmt"] = None
+
+    # 🎯 Asse X = ID evento, Asse Y = durata
+    labels = [ev["id"] for ev in eventi if ev.get("durata")]
+    durate = [ev["durata"] for ev in eventi if ev.get("durata")]
+
+    # Dati per tooltip (data + tipo)
+    tooltip_info = [
+        f"{ev['timestamp_inizio_fmt']} ({ev['tipo']})" for ev in eventi if ev.get("durata")
+    ]
+
+    return render_template(
+        "dashboard.html",
+        eventi=eventi,
+        stato=stato_catena,
+        labels=labels,
+        durate=durate,
+        tooltips=tooltip_info
+    )
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

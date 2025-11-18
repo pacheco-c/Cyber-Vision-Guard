@@ -1,5 +1,8 @@
 import cv2
 import time
+import os
+
+os.makedirs("frames", exist_ok=True)
 
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
@@ -53,6 +56,11 @@ while True:
         durata_movimento += 1/30
         if durata_movimento > SOGLIA_TEMPO and (tempo_attuale - ultimo_alert > COOLDOWN):
             print(f"Movimento rilevato alle {time.strftime('%H:%M:%S')}")
+            # --- 📸 Salvataggio screenshot del momento dell'alert ---
+            timestamp = int(time.time())
+            img_name = f"frames/screenshot_{timestamp}.jpg"
+            cv2.imwrite(img_name, frame_corrente)
+            print(f"Screenshot salvato: {img_name}")
             ultimo_alert = tempo_attuale
             durata_movimento = 0
     else:

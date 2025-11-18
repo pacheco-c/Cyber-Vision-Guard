@@ -41,7 +41,7 @@ def aggiorna_catena(evento):
     with open(CHAIN_FILE, "w") as f:
         json.dump(chain, f, indent=4)
 
-    print(f"🧱 Hash chain aggiornata. Nuovo blocco: {new_hash[:16]}...")
+   
     return new_hash, prev_hash  # 👈 ora restituisce entrambi
 
 

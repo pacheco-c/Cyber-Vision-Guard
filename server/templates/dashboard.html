@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Vision Guard – Dashboard</title>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #e6edf3;
+            font-family: "Inter", sans-serif;
+            padding: 30px;
+        }
+        .hash-ok {
+            color: #00ff88;
+        }
+        .hash-error {
+            color: #ff4c4c;
+        }
+        .table {
+            background-color: #161b22;
+            border-radius: 8px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        .refresh-btn {
+            background-color: #238636;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-left: 10px;
+        }
+        .refresh-btn:hover {
+            background-color: #2ea043;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🛡️ Cyber-Vision Guard Dashboard</h1>
+        <div>
+            <a href="/dashboard" class="refresh-btn">🔄 Aggiorna</a>
+            <button id="toggleChartBtn" class="refresh-btn">📊 Grafico durata</button>
+        </div>
+    </div>
+
+    <!-- Stato della catena -->
+    {% if stato %}
+        <p class="hash-ok">✅ Catena di integrità verificata: tutti i blocchi sono coerenti.</p>
+    {% else %}
+        <p class="hash-error">❌ Errore di integrità nella catena hash!</p>
+    {% endif %}
+
+
+    <h2 class="text-info">📈 Durata degli eventi nel tempo</h2>
+        <canvas id="eventChart" height="100" style="display:none;"></canvas>
+    <hr>
+    <!-- Tabella eventi -->
+    <table class="table table-dark table-striped mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Inizio</th>
+                <th>Fine</th>
+                <th>Durata (s)</th>
+                <th>Tipo</th>
+                <th>Hash Corrente</th>
+                <th>Hash Precedente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ev in eventi %}
+            <tr>
+                <td>{{ ev.id }}</td>
+                <td>{{ ev.timestamp_inizio }}</td>
+                <td>{{ ev.timestamp_fine }}</td>
+                <td>{{ ev.durata }}</td>
+                <td>{{ ev.tipo }}</td>
+                <td><code>{{ ev.hash_corrente[:10] if ev.hash_corrente else '—' }}</code></td>
+                <td><code>{{ ev.hash_precedente[:10] if ev.hash_precedente else '—' }}</code></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  window.eventLabels = {{ labels|tojson }};
+  window.eventDurations = {{ durate|tojson }};
+  window.eventTooltips = {{ tooltips|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+<script>
+    document.getElementById('toggleChartBtn').addEventListener('click', function() {
+        const chart = document.getElementById('eventChart');
+        if (chart.style.display === 'none') {
+            chart.style.display = 'block';
+        } else {
+            chart.style.display = 'none';
+        }
+    });
+</script>
+
+</html>

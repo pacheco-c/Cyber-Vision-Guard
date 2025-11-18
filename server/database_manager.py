@@ -33,8 +33,8 @@ def salva_evento(evento, hash_corrente, hash_precedente):
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO eventi (timestamp_inizio, timestamp_fine, durata, tipo, hash_corrente, hash_precedente)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO eventi (timestamp_inizio, timestamp_fine, durata, tipo, hash_corrente, hash_precedente, screenshot_path)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         dati = (
             evento["timestamp_inizio"],
@@ -42,7 +42,8 @@ def salva_evento(evento, hash_corrente, hash_precedente):
             evento["durata"],
             evento["tipo"],
             hash_corrente,
-            hash_precedente
+            hash_precedente,
+            evento.get("screenshot_path")
         )
         cursor.execute(query, dati)
         conn.commit()
@@ -52,3 +53,17 @@ def salva_evento(evento, hash_corrente, hash_precedente):
     finally:
         cursor.close()
         conn.close()
+def leggi_eventi():
+    """
+    Legge tutti gli eventi dal database per la dashboard.
+    Restituisce una lista di dizionari.
+    """
+    conn = crea_connessione()
+    eventi = []
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM eventi ORDER BY timestamp_inizio DESC LIMIT 100")
+        eventi = cursor.fetchall()
+        cursor.close()
+        conn.close()
+    return eventi

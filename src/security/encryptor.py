@@ -49,3 +49,29 @@ def cifra_evento(evento_dict):
     print(f"🔐 Evento cifrato e salvato: {filename}")
     print(f"🧾 Firma digitale: {firma[:12]}...")  # stampa prime 12 cifre
     return firma
+
+def cifra_immagine(percorso_img):
+    """
+    Cifra un'immagine JPEG e la salva come file .enc nella cartella 'frames_encrypted'.
+    """
+    from cryptography.fernet import Fernet
+    import base64, os
+
+    # Leggi la chiave segreta già esistente
+    with open("src/security/secret.key", "rb") as key_file:
+        key = key_file.read()
+    fernet = Fernet(key)
+
+    os.makedirs("frames_encrypted", exist_ok=True)
+    with open(percorso_img, "rb") as f:
+        dati = f.read()
+
+    dati_cifrati = fernet.encrypt(dati)
+    nome_output = os.path.basename(percorso_img).replace(".jpg", ".enc")
+    percorso_output = os.path.join("frames_encrypted", nome_output)
+
+    with open(percorso_output, "wb") as f:
+        f.write(dati_cifrati)
+
+    print(f"🔒 Immagine cifrata salvata in {percorso_output}")
+    return percorso_output
