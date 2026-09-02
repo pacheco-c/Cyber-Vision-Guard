@@ -54,21 +54,15 @@ def cifra_immagine(percorso_img):
     """
     Cifra un'immagine JPEG e la salva come file .enc nella cartella 'frames_encrypted'.
     """
-    from cryptography.fernet import Fernet
-    import base64, os
+    frames_dir = os.path.join(PROJECT_ROOT, "frames_encrypted")
+    os.makedirs(frames_dir, exist_ok=True)
 
-    # Leggi la chiave segreta già esistente
-    with open("src/security/secret.key", "rb") as key_file:
-        key = key_file.read()
-    fernet = Fernet(key)
-
-    os.makedirs("frames_encrypted", exist_ok=True)
     with open(percorso_img, "rb") as f:
         dati = f.read()
 
     dati_cifrati = fernet.encrypt(dati)
     nome_output = os.path.basename(percorso_img).replace(".jpg", ".enc")
-    percorso_output = os.path.join("frames_encrypted", nome_output)
+    percorso_output = os.path.join(frames_dir, nome_output)
 
     with open(percorso_output, "wb") as f:
         f.write(dati_cifrati)
