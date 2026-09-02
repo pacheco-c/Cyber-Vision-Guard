@@ -1,3 +1,13 @@
+"""
+ARCHIVIATO — 11 novembre 2025
+
+Prima versione del motion detector, precedente all'integrazione di YOLOv8.
+Rilevamento movimento puro (frame differencing), senza verifica AI della persona,
+senza cifratura né invio al server. Non più eseguito: la logica equivalente
+(aggiornata) vive ora in src/cyber_vision_guard.py.
+
+Conservato come riferimento storico dell'evoluzione del progetto.
+"""
 import cv2
 import time
 import os
