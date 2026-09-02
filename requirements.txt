@@ -3,3 +3,4 @@ cryptography
 flask
 requests
 ultralytics
+mysql-connector-python
