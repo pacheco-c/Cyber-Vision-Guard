@@ -70,4 +70,19 @@
 - Integrata cifratura e invio immagini al server.
 - Eseguiti test verifica.
 
+2 Settembre 2026
+
+- Ripreso lo sviluppo del progetto dopo una pausa.
+- Corretto requirements.txt: aggiunta la dipendenza mancante mysql-connector-python.
+- Corretto bug di percorso in security/encryptor.py: cifra_immagine() ora riusa l'istanza fernet a livello di modulo invece di riaprire secret.key con un path relativo fragile.
+- Archiviato il prototipo originale motion_detector.py nella cartella /archive, con un README che ne documenta il ruolo storico (poi integrato ed esteso in src/cyber_vision_guard.py).
+- Adottato un workflow a branch dedicati (fix/..., chore/...) con Pull Request per ogni modifica, niente più commit diretti su main.
+
+3 Settembre 2026
+
+- Spostate le credenziali MySQL hardcoded in variabili d'ambiente tramite python-dotenv (.env locale, .env.example committato).
+- Corretto un .gitignore incompleto: ora esclude correttamente frames/, frames_encrypted/, logs/, server/received_images/ (file generati a runtime).
+- Rimossi i file modello duplicati/inutilizzati: src/yolov8n.pt (copia ridondante del modello in root) e models/haarcascade_fullbody.xml (residuo del prototipo pre-YOLO, non più referenziato).
+- Rimosso src/security/test_decrypt.py: script di debug non funzionante spacciato per test (path hardcoded a un file di log inesistente), la cui logica utile è già coperta correttamente da decryptor.py:decifra_evento().
+
 
