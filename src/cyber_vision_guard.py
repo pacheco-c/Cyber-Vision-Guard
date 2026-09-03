@@ -15,6 +15,8 @@ print("Avvio Cyber-Vision Guard...")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
 MODEL_PATH = os.path.join(PROJECT_ROOT, "yolov8n.pt")
+FRAMES_DIR = os.path.join(PROJECT_ROOT, "frames")
+LOGS_DIR = os.path.join(PROJECT_ROOT, "logs")
 
 model = YOLO(MODEL_PATH)
 model.overrides['verbose'] = False  # Disattiva log nel terminale
@@ -79,15 +81,15 @@ while True:
         firma = cifra_evento(evento)
 
         # --- 📸 Salva uno screenshot del momento dell'evento ---
-        os.makedirs("frames", exist_ok=True)
-        screenshot_path = f"frames/screenshot_{int(time.time())}.jpg"
+        os.makedirs(FRAMES_DIR, exist_ok=True)
+        screenshot_path = os.path.join(FRAMES_DIR, f"screenshot_{int(time.time())}.jpg")
         cv2.imwrite(screenshot_path, frame_corrente)
         immagine_cifrata = cifra_immagine(screenshot_path)
         print(f"📸 Screenshot salvato in {screenshot_path}")
 
         # --- 🔐 Invio log + screenshot al server ---
-        ultimo_file = sorted(os.listdir("logs"))[-1]  # prende l'ultimo log creato
-        percorso_log = os.path.join("logs", ultimo_file)
+        ultimo_file = sorted(os.listdir(LOGS_DIR))[-1]  # prende l'ultimo log creato
+        percorso_log = os.path.join(LOGS_DIR, ultimo_file)
         invia_file_al_server(percorso_log, immagine_cifrata)
 
     # --- 3️⃣ Mostra stato sullo schermo ---
