@@ -1,6 +1,10 @@
 # --- server/database_manager.py ---
+import os
 import mysql.connector
 from mysql.connector import Error
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def crea_connessione():
     """
@@ -9,10 +13,10 @@ def crea_connessione():
     """
     try:
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",            # Cambia se usi un utente diverso
-            password="",  # Inserisci la tua password MySQL
-            database="cyber_vision_guard"
+            host=os.environ.get("DB_HOST", "localhost"),
+            user=os.environ.get("DB_USER", "root"),
+            password=os.environ.get("DB_PASSWORD", ""),
+            database=os.environ.get("DB_NAME", "cyber_vision_guard")
         )
         if conn.is_connected():
             print("✅ Connessione al database MySQL riuscita.")
@@ -20,7 +24,6 @@ def crea_connessione():
     except Error as e:
         print("❌ Errore durante la connessione:", e)
     return None
-
 def salva_evento(evento, hash_corrente, hash_precedente):
     """
     Salva un evento decifrato nel database MySQL.
