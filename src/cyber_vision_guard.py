@@ -12,7 +12,11 @@ from security.encryptor import cifra_immagine
 print("Avvio Cyber-Vision Guard...")
 
 # Modello YOLO per verifica AI
-model = YOLO("yolov8n.pt")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+MODEL_PATH = os.path.join(PROJECT_ROOT, "yolov8n.pt")
+
+model = YOLO(MODEL_PATH)
 model.overrides['verbose'] = False  # Disattiva log nel terminale
 
 # Apertura webcam
