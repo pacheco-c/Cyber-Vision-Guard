@@ -4,3 +4,4 @@ flask
 requests
 ultralytics
 mysql-connector-python
+python-dotenv
