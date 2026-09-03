@@ -44,3 +44,7 @@ server/hash_chain.json
 # File generati dal sistema
 *.sqlite3
 *.db
+frames/
+frames_encrypted/
+logs/
+server/received_images/
